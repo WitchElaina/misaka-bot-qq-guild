@@ -82,6 +82,14 @@ const load = (client: OpenAPI, ws: WebsocketClient) => {
             .catch((err) => {
               console.log(err, 'send err');
             });
+        } else if (hitokotoType === '小熊猫') {
+          await client.messageApi
+            .postMessage(data.msg.channel_id, {
+              content: '想 硬硬的 OO <emoji:66>',
+            })
+            .catch((err) => {
+              console.log(err, 'send err');
+            });
         } else {
           await client.messageApi
             .postMessage(data.msg.channel_id, {
