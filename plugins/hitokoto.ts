@@ -63,7 +63,7 @@ const sendHitokoto = async (channelID: string, client: OpenAPI, type_: string = 
 
 const load = (client: OpenAPI, ws: WebsocketClient) => {
   ws.on('GUILD_MESSAGES', async (data) => {
-    if (data.msg.content.startsWith('一言 ')) {
+    if (data.msg?.content?.startsWith('一言 ')) {
       const hitokotoType = data.msg.content.split(' ')[1];
       const keys = Object.keys(hitokotoTypeMap);
       const values = Object.values(hitokotoTypeMap);
@@ -100,7 +100,7 @@ const load = (client: OpenAPI, ws: WebsocketClient) => {
             });
         }
       }
-    } else if (data.msg.content === '一言') {
+    } else if (data.msg?.content === '一言') {
       await sendHitokoto(data.msg.channel_id, client);
     }
   });

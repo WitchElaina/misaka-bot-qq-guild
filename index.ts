@@ -7,7 +7,11 @@ import {
   GetWsParam,
   AvailableIntentsEventsEnum as INTENTS,
 } from '@misaka-bot/sdk';
+
 import hitokoto from './plugins/hitokoto';
+import gpt from './plugins/gpt';
+
+import { getGuilds, getChannelIdbyName } from './utils/channel';
 
 import { config } from 'dotenv';
 // dotenv
@@ -29,9 +33,22 @@ const wsConfig: GetWsParam = {
 };
 
 const ws = createWebsocket(wsConfig);
+getChannelIdbyName('GPT', process.env.TEST_GUILD_ID as string, client).then((res) => {
+  console.log(res);
+  gpt.load(client, ws, res);
+});
 
 ws.on(INTENTS.GUILD_MESSAGES, (data) => {
-  console.log(data.msg.author.username + ': ' + data.msg.content);
+  console.log(data?.msg?.author?.username + ': ' + data?.msg?.content);
+  console.log(data?.msg?.author?.username + ': ' + data?.msg?.attachments[0]?.url);
+  client.messageApi
+    .postMessage(data?.msg?.channel_id, {
+      // image: 'https://' + String(data?.msg?.attachments[0]?.url),
+      image: 'https://avatars.githubusercontent.com/u/140401787?s=400&v=4',
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 hitokoto.load(client, ws);

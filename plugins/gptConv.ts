@@ -1,7 +1,8 @@
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai';
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 
-dotenv.config();
+config();
+console.log(process.env.OPENAI_ORG_ID, process.env.OPENAI_API_KEY);
 const configuration = new Configuration({
   organization: process.env.OPENAI_ORG_ID,
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,31 +11,21 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const newChat = async (messages: ChatCompletionRequestMessage[]) => {
-  const response = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
-    messages,
-  });
-  return response.data;
+  let response;
+  await openai
+    .createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages,
+    })
+    .then((res) => {
+      console.log(res.data);
+      response = res.data.choices[0];
+    })
+    .catch((err) => {
+      console.log(err.data);
+      throw err;
+    });
+  return response;
 };
 
-export default class GptConversation {
-  messages: ChatCompletionRequestMessage[];
-  constructor() {
-    this.messages = [];
-  }
-
-  async addMessage(message: ChatCompletionRequestMessage) {
-    this.messages.push(message);
-    await newChat(this.messages).then((res) => {});
-  }
-
-  async getMessages() {
-    return this.messages;
-  }
-
-  async reset() {
-    this.messages = [];
-  }
-}
-
-const conversation = new GptConversation();
+export { newChat };
