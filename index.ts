@@ -10,6 +10,7 @@ import {
 
 import hitokoto from './plugins/hitokoto';
 import gpt from './plugins/gpt';
+import pixiv from './plugins/pixiv';
 
 import { getGuilds, getChannelIdbyName } from './utils/channel';
 
@@ -43,8 +44,7 @@ ws.on(INTENTS.GUILD_MESSAGES, (data) => {
   console.log(data?.msg?.author?.username + ': ' + data?.msg?.attachments[0]?.url);
   client.messageApi
     .postMessage(data?.msg?.channel_id, {
-      // image: 'https://' + String(data?.msg?.attachments[0]?.url),
-      image: 'https://avatars.githubusercontent.com/u/140401787?s=400&v=4',
+      image: 'https://' + String(data?.msg?.attachments[0]?.url),
     })
     .catch((err) => {
       console.log(err);
@@ -52,5 +52,6 @@ ws.on(INTENTS.GUILD_MESSAGES, (data) => {
 });
 
 hitokoto.load(client, ws);
+pixiv.load();
 
 export { client, ws };
