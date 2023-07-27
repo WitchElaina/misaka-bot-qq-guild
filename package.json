@@ -14,8 +14,6 @@
     "@types/ws": "^8.2.0",
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
-    "openai": "^3.3.0",
-    "pixiv-app-api": "^1.2.1",
-    "pixiv-img": "^1.0.0"
+    "openai": "^3.3.0"
   }
 }
