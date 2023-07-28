@@ -11,21 +11,18 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const newChat = async (messages: ChatCompletionRequestMessage[]) => {
-  let response;
-  await openai
+  return await openai
     .createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages,
     })
     .then((res) => {
-      console.log(res.data);
-      response = res.data.choices[0];
+      return res.data.choices[0].message?.content || 'No response';
     })
     .catch((err) => {
       console.log(err.data);
       throw err;
     });
-  return response;
 };
 
 export { newChat };

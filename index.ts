@@ -10,7 +10,7 @@ import {
 
 import hitokoto from './plugins/hitokoto';
 import gpt from './plugins/gpt';
-import pixiv from './plugins/pixiv';
+import sentiment from './plugins/sentiment';
 
 import { getGuilds, getChannelIdbyName } from './utils/channel';
 
@@ -37,21 +37,22 @@ const ws = createWebsocket(wsConfig);
 getChannelIdbyName('GPT', process.env.TEST_GUILD_ID as string, client).then((res) => {
   console.log(res);
   gpt.load(client, ws, res);
+  sentiment.load(client, ws, res);
 });
 
-ws.on(INTENTS.GUILD_MESSAGES, (data) => {
-  console.log(data?.msg?.author?.username + ': ' + data?.msg?.content);
-  console.log(data?.msg?.author?.username + ': ' + data?.msg?.attachments[0]?.url);
-  client.messageApi
-    .postMessage(data?.msg?.channel_id, {
-      image: 'https://' + String(data?.msg?.attachments[0]?.url),
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
+// ws.on(INTENTS.GUILD_MESSAGES, (data) => {
+//   console.log(data?.msg?.author?.username + ': ' + data?.msg?.content);
+//   console.log(data?.msg?.author?.username + ': ' + data?.msg?.attachments[0]?.url);
+//   client.messageApi
+//     .postMessage(data?.msg?.channel_id, {
+//       image: 'https://' + String(data?.msg?.attachments[0]?.url),
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// });
 
 hitokoto.load(client, ws);
-pixiv.load();
+// pixiv.load();
 
 export { client, ws };
