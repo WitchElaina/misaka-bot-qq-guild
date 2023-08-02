@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { config } from 'dotenv';
 import { OpenAPI, WebsocketClient } from '@misaka-bot/sdk';
+import { sendTextMsg } from '../utils/message';
+import { setEnvironmentData } from 'worker_threads';
 
 config();
 
@@ -52,13 +54,7 @@ const getHitokoto = async (type_: string = 'a') => {
 
 const sendHitokoto = async (channelID: string, client: OpenAPI, type_: string = 'a') => {
   const hitokoto = await getHitokoto(type_);
-  await client.messageApi
-    .postMessage(channelID, {
-      content: hitokoto,
-    })
-    .catch((err) => {
-      console.log(err, 'send err');
-    });
+  await sendTextMsg(client, channelID, hitokoto);
 };
 
 const load = (client: OpenAPI, ws: WebsocketClient) => {
@@ -75,29 +71,15 @@ const load = (client: OpenAPI, ws: WebsocketClient) => {
         } else if (values.includes(hitokotoType)) {
           await sendHitokoto(data.msg.channel_id, client, hitokotoType);
         } else if (hitokotoType === 'help' || hitokotoType === '帮助') {
-          await client.messageApi
-            .postMessage(data.msg.channel_id, {
-              content: `一言帮助：\n${hitokotoTypeMap.toString()}`,
-            })
-            .catch((err) => {
-              console.log(err, 'send err');
-            });
+          await sendTextMsg(
+            client,
+            data.msg.channel_id,
+            `一言帮助：\n${hitokotoTypeMap.toString()}`,
+          );
         } else if (hitokotoType === '小熊猫') {
-          await client.messageApi
-            .postMessage(data.msg.channel_id, {
-              content: '想 硬硬的 OO <emoji:66>',
-            })
-            .catch((err) => {
-              console.log(err, 'send err');
-            });
+          await sendTextMsg(client, data.msg.channel_id, '想 硬硬的 OO <emoji:66>');
         } else {
-          await client.messageApi
-            .postMessage(data.msg.channel_id, {
-              content: '参数不合法',
-            })
-            .catch((err) => {
-              console.log(err, 'send err');
-            });
+          await sendTextMsg(client, data.msg.channel_id, '参数不合法');
         }
       }
     } else if (data.msg?.content === '一言') {

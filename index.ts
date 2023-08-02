@@ -35,9 +35,14 @@ const wsConfig: GetWsParam = {
 
 const ws = createWebsocket(wsConfig);
 getChannelIdbyName('GPT', process.env.TEST_GUILD_ID as string, client).then((res) => {
-  console.log(res);
+  console.log('GPT enable channel ID:', res);
   gpt.load(client, ws, res);
   sentiment.load(client, ws, res);
+});
+
+getChannelIdbyName('GPT连续对话', process.env.TEST_GUILD_ID as string, client).then((res) => {
+  console.log('GPT连续对话 enable channel ID:', res);
+  gpt.loadContinuous(client, ws, res);
 });
 
 // ws.on(INTENTS.GUILD_MESSAGES, (data) => {
