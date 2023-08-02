@@ -1,23 +1,44 @@
 import { WebsocketClient, OpenAPI } from '@misaka-bot/sdk';
 import EventEmitter from 'events';
 
+export enum MisakaPluginEvent {
+  LOAD_ERROR = 'LOAD_ERROR',
+  MESSAGE = 'MESSAGE',
+}
+
+export type MisaPluginEventHanler = (...args: any[]) => void;
+
 export interface MisakaPluginConfig {
   prompt: string;
-  blockChannels: string[];
 }
 
 export class MisakaPlugin extends EventEmitter {
   prompt: string;
-  client: OpenAPI | null;
-  ws: WebsocketClient | null;
+  client!: OpenAPI;
+  ws!: WebsocketClient;
+  events: Map<string, MisaPluginEventHanler>;
+  load() {}
+
   constructor(config: MisakaPluginConfig) {
     super();
     this.prompt = config.prompt;
-    this.client = null;
-    this.ws = null;
+    this.events = new Map<string, MisaPluginEventHanler>();
   }
-  load(client: OpenAPI, ws: WebsocketClient) {
+  plug(client: OpenAPI, ws: WebsocketClient) {
     this.client = client;
     this.ws = ws;
+    this.load();
+    this.messageHandler();
+  }
+  addEvent(events: string[], handler: MisaPluginEventHanler) {
+    events.forEach((event) => {
+      this.events.set(event, handler);
+    });
+  }
+  messageHandler() {
+    this.addEvent([MisakaPluginEvent.LOAD_ERROR], (err: Error) => {});
+    for (const [event, handler] of this.events) {
+      this.on(event, handler);
+    }
   }
 }

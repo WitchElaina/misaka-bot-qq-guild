@@ -4,6 +4,8 @@ import { config } from 'dotenv';
 import { createLanguageModel, createJsonTranslator, processRequests } from 'typechat';
 import { SentimentResponse } from './sentimentSchema';
 import { OpenAPI, WebsocketClient } from '@misaka-bot/sdk';
+import { MisakaPlugin, MisakaPluginConfig } from '../../plugin';
+import { sendTextMsg } from '../../utils/message';
 
 config();
 
@@ -21,17 +23,20 @@ const judgeSentiment = async (text: string) => {
   return response.data.sentiment;
 };
 
-const load = (client: OpenAPI, ws: WebsocketClient, channel: string) => {
-  ws.on('GUILD_MESSAGES', async (data) => {
-    if (data.msg.channel_id !== channel || !data.msg?.content?.startsWith('smt ')) return;
-    const sentimentRes = await judgeSentiment(data.msg.content.slice(4)).then((res) => {
-      console.log('smt: ', data.msg.content.slice(4), res);
-      return res;
+class Sentiment extends MisakaPlugin {
+  constructor(config: MisakaPluginConfig) {
+    super(config);
+    this.addEvent(['DEFAULT_COMMAND'], async (data: any) => {
+      const sentimentRes = await judgeSentiment(data.msg.content.slice(4)).then((res) => {
+        return res;
+      });
+      await sendTextMsg(
+        this.client,
+        data.msg.channel_id,
+        sentimentRes !== undefined ? sentimentRes : 'Error',
+      );
     });
-    await client.messageApi.postMessage(data.msg.channel_id, {
-      content: sentimentRes !== undefined ? sentimentRes : 'Error',
-    });
-  });
-};
+  }
+}
 
-export default { load };
+export default Sentiment;
