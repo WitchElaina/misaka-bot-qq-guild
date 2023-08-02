@@ -33,7 +33,7 @@ export class MisakaBot {
   load(plugin: MisakaPlugin) {
     plugin.plug(this.client, this.ws);
     this.ws.on('GUILD_MESSAGES', (data) => {
-      if (data.msg.content.startsWith(plugin.prompt + ' ')) {
+      if (data.msg?.content.startsWith(plugin.prompt + ' ')) {
         data.msg.content = data.msg.content.slice((plugin.prompt + ' ').length);
         const cmd = data.msg.content.split(' ')[0];
         if (plugin.eventNames().includes(cmd)) {
@@ -43,7 +43,7 @@ export class MisakaBot {
           plugin.emit('DEFAULT_COMMAND', data);
         }
       }
-      if (data.msg.content === plugin.prompt) {
+      if (data.msg?.content === plugin.prompt) {
         console.log(`[${plugin.prompt}]emit: DEFAULT_COMMAND`);
         plugin.emit('DEFAULT_COMMAND', data);
       }
